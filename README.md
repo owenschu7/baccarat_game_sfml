@@ -1,8 +1,8 @@
 # Baccarat Game (eventually online)
 
 ## Command line
-cmake -B build //builds the build folder
-cmake --build build // builds the executable
+cmake -B build //builds the build folder \n
+cmake --build build // builds the executable \n
 build/bin/run //execute the executable (run)
 
 Baccarat rules: (thanks to gemini)
