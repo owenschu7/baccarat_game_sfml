@@ -30,6 +30,7 @@ protected:
 public:
   virtual ~Screen() = default;
 
+  // member initializer list
   Screen(SharedData& shared) : m_shared(shared) {}
 
   // every screen must implement these three functions

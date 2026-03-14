@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Config.hpp>
+#include <iostream>
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <memory>
@@ -12,6 +14,11 @@
 
 int main()
 {
+  std::cout << "SFML Version: " 
+              << SFML_VERSION_MAJOR << "." 
+              << SFML_VERSION_MINOR << "." 
+              << SFML_VERSION_PATCH << std::endl;
+
   //            sf::RenderWindow: this created the actual window on your operating system.
   //                              you are passing it a VideoMode and the title that appears at the top 
   //                              of the window. the u just tells C++ that these are "unsigned" integers
@@ -36,22 +43,29 @@ int main()
   // Load the font at size 40.0f pixels. 
   // ImGui rasterizes fonts at a specific size, so it's best to load it at the size you want to display it!
 
-  // 1. Load the default font (Slot 0)
-  ImFont* defaultFont = io.Fonts->AddFontFromFileTTF("assets/fonts/8bitOperatorPlus8-Regular.ttf", 30.0f);
+  // Load the default font (Slot 0)
+  ImFont* defaultFont = io.Fonts->AddFontFromFileTTF("assets/fonts/8bitOperatorPlus8-Regular.ttf", 20.0f);
   if (!defaultFont) 
   {
       std::cerr << "Failed to load the BIG ImGui font. Check the file path!\n";
       return -1; // Stops the g.WithinFrameScope crash!
   }
   
-  // 2. Load the big font (Slot 1)
+  // Load the big font (Slot 1)
   ImFont* bigFont = io.Fonts->AddFontFromFileTTF("assets/fonts/8bitOperatorPlus8-Regular.ttf", 70.0f);
   if (!bigFont) 
   {
       std::cerr << "Failed to load the SMALL ImGui font. Check the file path!\n";
       return -1; // Stops the g.WithinFrameScope crash!
   }
-
+  
+  // Load the big font (Slot 2)
+  ImFont* titleButtonFont = io.Fonts->AddFontFromFileTTF("assets/fonts/8bitOperatorPlus8-Regular.ttf", 40.0f);
+  if (!titleButtonFont) 
+  {
+      std::cerr << "Failed to load the titleButtonFont ImGui font. Check the file path!\n";
+      return -1; // Stops the g.WithinFrameScope crash!
+  }
 
 
 

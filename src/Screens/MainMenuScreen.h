@@ -39,7 +39,7 @@ private:
     ImVec2 textSize = ImGui::CalcTextSize(titleString);
 
     float textX = (screenSize.x - textSize.x) * 0.5f;
-    float textY = (screenSize.y - textSize.y) * 0.5f;
+    float textY = (screenSize.y - textSize.y) * 0.4f;
 
     ImGui::SetCursorPos(ImVec2(textX, textY));
     ImGui::Text("%s", titleString);
@@ -51,10 +51,10 @@ private:
     float buttonWidth = 600.0f;
     float buttonHeight = 80.0f;
     float leftPadding = 40.0f;
-    float centerY = screenSize.y * 0.60f; 
+    float centerY = screenSize.y * 0.50f; 
 
-    ImFont* smallFont = ImGui::GetIO().Fonts->Fonts[0];
-    ImGui::PushFont(smallFont);
+    ImFont* titleButtonFont = ImGui::GetIO().Fonts->Fonts[2];
+    ImGui::PushFont(titleButtonFont);
 
     // Move cursor for the first button
     ImGui::SetCursorPosX(leftPadding);
@@ -86,7 +86,7 @@ private:
         nextState = ScreenState::Quit;
     }
 
-    // FIX: for developers only
+    // NOTE: for developers only
     ImGui::SetCursorPosX(leftPadding);
     if (ImGui::Button("Demo", ImVec2(0.0f, buttonHeight))) 
     {
