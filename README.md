@@ -5,7 +5,7 @@ cmake -B build //builds the build folder \n
 cmake --build build // builds the executable \n
 build/bin/run //execute the executable (run)
 
-Baccarat rules: (thanks to gemini)
+Baccarat rules:
 In Baccarat, the goal is to bet on which of two hands—the Player or the Banker—will have a 
 total value closest to 9. Each card has a specific value: aces are worth 1, face cards and 
 10s are worth 0, and numbered cards 2 through 9 are worth their face value. If a hand's 
