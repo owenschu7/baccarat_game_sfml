@@ -4,6 +4,8 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <memory>
+#include "core/SharedData.h"
+#include "core/SettingsManager.h"
 #include "Screens/Screen.h"
 #include "Screens/MainMenuScreen.h"
 #include "Screens/GameScreen.h"
@@ -11,9 +13,27 @@
 #include "Screens/demoScreen.h"
 #include "Screens/availableTablesScreens.h"
 //include other screens here
+#include "uuid.h"
+
+std::string GenerateRealUUID() 
+{
+  // 1. Create a secure random number engine
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  
+  // 2. Pass the engine to stduuid's random generator
+  uuids::uuid_random_generator uuid_gen{gen};
+  uuids::uuid const id = uuid_gen();
+  
+  // 3. Convert to string
+  return uuids::to_string(id);
+}
+
+void applyChanges(SharedData &data);
 
 int main()
 {
+  //debug info
   std::cout << "SFML Version: " 
               << SFML_VERSION_MAJOR << "." 
               << SFML_VERSION_MINOR << "." 
@@ -22,7 +42,7 @@ int main()
   //            sf::RenderWindow: this created the actual window on your operating system.
   //                              you are passing it a VideoMode and the title that appears at the top 
   //                              of the window. the u just tells C++ that these are "unsigned" integers
-  auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
+  auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "Baccarat Online");
 
   //IMGUI setup
   if (!ImGui::SFML::Init(window, false))
@@ -35,10 +55,32 @@ int main()
   // --- LOAD CUSTOM FONT ---
   ImGuiIO& io = ImGui::GetIO();
   
-  
   // load sharedData (for settings and account info)
   SharedData sharedData; // Lives here for the whole program
 
+  // initialize manager to find data at specific path
+  SettingsManager settings("data/settings.txt");
+  settings.Load(sharedData); // loads data from settings.txt and stores it in m_shared
+
+  // create a UUID if there is none
+  if (sharedData.s_currentUUID.empty()) 
+  {
+    // Generate a new local UUID for the offline client
+    sharedData.s_currentUUID = GenerateRealUUID();
+    
+    // Save the new UUID immediately so it persists next time
+    settings.Save(sharedData);
+
+    sharedData.s_AuthState = AuthState::NeedUsername;
+  }
+  else
+  {
+    sharedData.s_AuthState = AuthState::LoggedIn;
+  }
+
+  // settingsChanged update logic
+  // force a change so we get changes to load to screen
+  sharedData.s_settingsChanged = true;
 
   // Load the font at size 40.0f pixels. 
   // ImGui rasterizes fonts at a specific size, so it's best to load it at the size you want to display it!
@@ -133,6 +175,21 @@ int main()
     // Update ImGui BEFORE your screens update, so your screens can build UI
     ImGui::SFML::Update(window, deltaClock.restart());
 
+    //global state watcher
+    // this is where the changes (if any) will be applied to the game
+    // this only needs to happen AFTER settings are changed (not every frame)
+    if (sharedData.s_settingsChanged)
+    {
+      applyChanges(sharedData);
+
+      //save the data to the file for next session
+      settings.Save(sharedData);
+      
+      //after we apply changes we set it to false to catch for other changes in
+      // the future so that we dont constantly waste compute
+      sharedData.s_settingsChanged = false;
+    }
+
     //state switching logic
     // on every single frame, the manager asks the active screen
     // do you want to switch to a different screen?
@@ -223,7 +280,14 @@ int main()
   return 0;
 }
 
+void applyChanges(SharedData &data)
+{
+  //check each data point and change it globally
+  data.s_lightMode ? ImGui::StyleColorsLight() : ImGui::StyleColorsDark();
 
 
-
+  // --- FUTURE ADDITIONS GO HERE ---
+  // For example, when you add audio, you can update it instantly like this:
+  // sf::Listener::setGlobalVolume(data.s_musicVolume * 100.f);
+}
 

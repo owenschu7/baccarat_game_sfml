@@ -1,0 +1,7 @@
+UUID=0baa1ae6-1d27-420b-90fc-6e6bac838527
+username=owenschu7
+lightMode=0
+musicVolume=0.239583
+sfxVolume=0.190104
+videoQuality=0
+language=0

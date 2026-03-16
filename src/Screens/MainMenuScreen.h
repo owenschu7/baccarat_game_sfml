@@ -1,6 +1,7 @@
 #include "Screen.h"
 #include <SFML/Graphics.hpp>
 #include <imgui.h>
+#include <iostream> // FIX: debug info
 
 class MainMenuScreen : public Screen
 {
@@ -92,67 +93,95 @@ private:
     ImGui::PopFont();
   }
 
-  // Define the stages of your login process
-  // FIX: put this in a better spot
-  enum class AuthState {
-      CheckingFiles,   // Looking for player_data.json
-      NeedUsername,    // First time playing
-      MainMenu,        // Logged in (playing the game)
-      LinkingAccount   // User clicked the "Secure Account" button
-  };
-  AuthState s_currentAuthState = AuthState::NeedUsername;
-  char usernameBuf[32] = "";
-  std::string s_currentUsername = "";
-  std::string s_currentUUID = "";
 
 
 
-  void DrawUsernameSelectionModal()
+
+  void DrawUsername(ImVec2 screenSize)
   {
+    static char usernameBuf[32] = "";
     //first we check which AuthState we are in to determine where to draw/update stuff goes
-    if (s_currentAuthState == AuthState::NeedUsername)
+
+    switch (m_shared.s_AuthState)
     {
-
-      //draw the popup to get username info
-      // 2. Center the popup on the screen
-      ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-      ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-      // 1. Tell ImGui to actually open the modal!
-      // The string here MUST match the string in BeginPopupModal exactly.
-      ImGui::OpenPopup("WELCOME...");
-
-      // 3. Define the flags to make it static (no moving, no resizing, no collapsing)
-      ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | 
-        ImGuiWindowFlags_NoResize | 
-        ImGuiWindowFlags_AlwaysAutoResize | 
-        ImGuiWindowFlags_NoCollapse;
-
-      // 4. Begin the modal
-      if (ImGui::BeginPopupModal("WELCOME...", NULL, flags))
+      case AuthState::NeedUsername:
       {
-        ImGui::Text("Please Enter a Username:");
-        ImGui::Separator();
+        //center the modal to the center of the screen
 
-        ImGui::InputText("##username", usernameBuf, IM_ARRAYSIZE(usernameBuf));
+        float centerX = (screenSize.x / 2.0f);
+        float centerY = (screenSize.y / 2.0f);
 
-        if (ImGui::Button("Enter"))
+        //draw the popup to get username info
+        // center the popup on the screen
+        // to do this we use SetNextWindowPos(), it sets the next location to draw a window at 
+        // (in our case its the popup and we want it in the center of the screen)
+        ImGui::SetNextWindowPos(ImVec2(centerX, centerY), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        // 1. Tell ImGui to actually open the modal!
+        // The string here MUST match the string in BeginPopupModal exactly.
+        ImGui::OpenPopup("WELCOME...");
+
+        // 3. Define the flags to make it static (no moving, no resizing, no collapsing)
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | 
+          ImGuiWindowFlags_NoResize | 
+          ImGuiWindowFlags_AlwaysAutoResize | 
+          ImGuiWindowFlags_NoCollapse;
+
+        // 4. Begin the modal
+        if (ImGui::BeginPopupModal("WELCOME...", NULL, flags))
         {
-          if (strlen(usernameBuf) > 0) {
-            // 1. Generate UUID
-            // 2. Save UUID + usernameBuf to local JSON file
-            // 3. Update memory
-            s_currentUsername = usernameBuf;
+          ImGui::Text("Please Enter a Username:");
+          ImGui::Separator();
+
+          ImGui::InputText("##username", usernameBuf, IM_ARRAYSIZE(usernameBuf));
+
+          if (ImGui::Button("Enter"))
+          {
+            std::cout << "enter pressed" << std::endl;
+            m_shared.s_currentUsername = usernameBuf;
+            m_shared.s_settingsChanged = true;
 
             // Move to the next screen!
-            s_currentAuthState = AuthState::MainMenu; 
+            m_shared.s_AuthState = AuthState::LoggedIn; 
 
             ImGui::CloseCurrentPopup();
           }
+          ImGui::EndPopup();
         }
-        ImGui::EndPopup();
+        break;
       }
-    // if username is already set (do somthing)
+      case AuthState::LoggedIn:
+      {
+        ImFont* defaultFont = ImGui::GetIO().Fonts->Fonts[0];
+        ImGui::PushFont(defaultFont);
+
+        // Combine the label with the actual username 
+        // (Assumes m_shared.s_currentUsername is a std::string or const char*)
+        std::string displayText = "Username: " + m_shared.s_currentUsername;
+
+        // Calculate size based on the complete text
+        ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+        
+        float bottomLeftPadding = 20.0f; 
+        
+        // Calculate X and Y positions
+        float textX = bottomLeftPadding; 
+        float textY = screenSize.y - textSize.y - bottomLeftPadding; 
+
+        ImGui::SetCursorPos(ImVec2(textX, textY));
+        
+        // Push White text color (R: 1.0, G: 1.0, B: 1.0, Alpha: 1.0)
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); 
+        
+        // Print the final string
+        ImGui::Text("%s", displayText.c_str());
+        
+        ImGui::PopStyleColor();
+        ImGui::PopFont();
+        break;
+      }
+      default:
+        break;
     }
   }
 
@@ -201,7 +230,7 @@ public:
     // - new user (prompts for username, then stores it)
     // - logged in (draws username in corner)
     // - searching for username (looking in files/authenticating with servers)
-    DrawUsernameSelectionModal(); 
+    DrawUsername(screenSize); 
 
     // 3. End the window
     ImGui::End();

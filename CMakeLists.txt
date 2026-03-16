@@ -54,6 +54,7 @@ FetchContent_MakeAvailable(imgui_sfml)
 # them here -------------------V
 add_executable(run 
   src/main.cpp
+  src/core/SettingsManager.cpp
   src/Screens/Screen.h
   src/Screens/MainMenuScreen.h
   src/Screens/GameScreen.h
@@ -74,13 +75,14 @@ add_executable(run
 
   # src/Card.cpp <- example
 )
-target_compile_features(run PRIVATE cxx_std_17)
+target_compile_features(run PRIVATE cxx_std_20)
 
 # this connects the SFML libraries to your executable.
 # if your games noods networking, you would simlpy add sfml-network to this
 target_link_libraries(run PRIVATE 
   SFML::Graphics
   ImGui-SFML::ImGui-SFML
+  uuid
 )
 
 
