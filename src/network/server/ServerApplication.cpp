@@ -257,14 +257,14 @@ void ServerApplication::disconnectClient(size_t pollIndex)
   m_pollFds.erase(m_pollFds.begin() + pollIndex);
 }
 
-int ServerApplication::sendAll(int sockfd, const char *buf, int *len) 
+int ServerApplication::sendAll(int sockfd, const uint8_t *buf, size_t &len) 
 {
   DEBUG_PRINT << "ServerApplication.cpp: sendAll():\n";
-  int total = 0;
-  int bytes_left = *len;
-  int n;
+  size_t total = 0;
+  size_t bytes_left = len;
+  ssize_t n = 0;
 
-  while (total < *len) 
+  while (total < len) 
   {
     n = send(sockfd, buf + total, bytes_left, 0);
     if (n == -1) { break; }
@@ -272,16 +272,12 @@ int ServerApplication::sendAll(int sockfd, const char *buf, int *len)
     bytes_left -= n;
   }
 
-  *len = total;
+  len = total;
   return n == -1 ? -1 : 0;
 }
 
-/**
- * [CURSOR IS HERE]
- *
- * @param client_fd 
- * @param event 
- */
+
+//sendEventToClient - builds a packet and sends it 
 void ServerApplication::sendEventToClient(int client_fd, const GameEvent& event)
 {
   PacketBuilder builder;
@@ -295,7 +291,10 @@ void ServerApplication::sendEventToClient(int client_fd, const GameEvent& event)
   builder.appendString(event.stringPayload.c_str());
   builder.finalize(); 
 
-  ssize_t bytesSent = send(client_fd, builder.getPtr(), builder.getSize(), 0);
+  
+  size_t len = builder.getSize();
+
+  ssize_t bytesSent = sendAll(client_fd, builder.getPtr(), len);
   if (bytesSent < 0) {
     std::cerr << "[NETWORK] Failed to send response to FD " << client_fd << "\n";
   }

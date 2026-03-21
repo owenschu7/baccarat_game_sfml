@@ -35,11 +35,12 @@ void TableManager::routeEventToTable(int tableID, Player* player, const GameEven
   }
 }
 
-GameEvent TableManager::getLobbyListEvent() {
-  GameEvent response;
+//returns a GameEvent that holds
+GameEvent TableManager::getAvailableTablesListEvent() {
+  GameEvent event;
 
   // Updated to match your specific Enum name
-  response.type = EventType::GET_AvailableTables; 
+  event.type = EventType::GET_AvailableTables; 
 
   // We use a stringstream to build a "CSV-style" string of all tables
   // Format: "ID,Type,Current,Max|ID,Type,Current,Max|"
@@ -55,11 +56,11 @@ GameEvent TableManager::getLobbyListEvent() {
   }
 
   // Store the built string in the payload
-  response.stringPayload = ss.str();
+  event.stringPayload = ss.str();
 
-  DEBUG_PRINT << "TableManager: Generated lobby list: " << response.stringPayload << "\n";
+  DEBUG_PRINT << "TableManager: Generated lobby list: " << event.stringPayload << "\n";
 
-  return response;
+  return event;
 }
 
 bool TableManager::addPlayerToTable(int tableID, Player* player) {

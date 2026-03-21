@@ -41,6 +41,47 @@ private:
     ImGui::PopFont();
   }
 
+  
+  void drawTopRightUI(ImVec2 screenSize)
+  {
+    // Define the strings to display
+    // Using m_shared.s_isOnline which you update in your network loop
+    const char* statusText = m_shared.s_isOnline ? "Status: Online" : "Status: Offline"; 
+    const char* usernameText = "Username: Guest"; // Change to m_shared.s_username.c_str() if you have one!
+    
+    ImVec4 statusColor = m_shared.s_isOnline ? ImVec4(0.2f, 1.0f, 0.2f, 1.0f) 
+                                             : ImVec4(1.0f, 0.2f, 0.2f, 1.0f); 
+
+
+    // Margin from the top and right edges of the screen
+    float margin = 20.0f;
+    float currentY = 20.0f;
+
+    // 1. Draw Status
+    ImVec2 statusSize = ImGui::CalcTextSize(statusText);
+    ImGui::SetCursorPos(ImVec2(screenSize.x - statusSize.x - margin, currentY));
+    ImGui::PushStyleColor(ImGuiCol_Text, statusColor); 
+    ImGui::Text("%s", statusText);
+    currentY += statusSize.y + 5.0f; // Move down for the next element
+
+    // 2. Draw Username (Below Status)
+    ImVec2 userSize = ImGui::CalcTextSize(usernameText);
+    ImGui::SetCursorPos(ImVec2(screenSize.x - userSize.x - margin, currentY));
+    ImGui::Text("%s", usernameText);
+    currentY += userSize.y + 10.0f; // Move down and add a little extra padding for the button
+
+    // 3. Draw Login Button (Below Username)
+    float btnWidth = 100.0f;
+    ImGui::SetCursorPos(ImVec2(screenSize.x - btnWidth - margin, currentY));
+    if (ImGui::Button("Login", ImVec2(btnWidth, 0)))
+    {
+      // TODO: Handle Login button click
+      // send an SYS_Connect event to login to the server as a player
+    }
+    ImGui::PopStyleColor();
+  }
+
+
   void drawTitle(ImVec2 screenSize)
   {
     ImFont* titleFont = ImGui::GetIO().Fonts->Fonts[1];
@@ -57,6 +98,7 @@ private:
     ImGui::PopFont();
     ImGui::PopStyleColor();
   }
+
 
   void drawButtons(ImVec2 screenSize)
   {
@@ -242,7 +284,7 @@ public:
     drawServerStatus(screenSize);
     drawTitle(screenSize);
     drawButtons(screenSize);
-
+    drawTopRightUI(screenSize);
     // will draw username based on 3 conditions 
     // - new user (prompts for username, then stores it)
     // - logged in (draws username in corner)

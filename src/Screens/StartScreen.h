@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <imgui.h>
 #include <iostream> // FIX: debug info
+#include "../core/Debug.h"
 
 class StartScreen : public Screen
 {
@@ -55,6 +56,13 @@ private:
     // (If you still want them to be chunky 100px tall buttons, use ImVec2(0.0f, 100.0f) instead!)
     if (ImGui::Button("Start", ImVec2(0.0f, buttonHeight))) 
     {
+      DEBUG_PRINT << "StartScreen: Pushing USER_In to server...\n";           //<-------------------
+      GameEvent loginEvent;                                                    //<-------------------
+      loginEvent.type = EventType::USER_In;                                    //<-------------------
+      loginEvent.senderUsername = m_shared.s_currentUsername;                  //<-------------------
+      loginEvent.stringPayload = "password123"; // Placeholder for future auth //<-------------------
+      m_shared.s_outboundEvents.push(loginEvent);                              //<-------------------
+
       //switch to a loading screen
       //connect to the server
       // switch to MainMenu
@@ -168,6 +176,12 @@ public:
     //set up a dark blue background for the menu
     menuBackground.setSize(sf::Vector2f({1920.0f, 1080.0f}));
     menuBackground.setFillColor(sf::Color(20, 20, 50));
+    //connect to the server
+    DEBUG_PRINT << "StartScreen(constructor): Pushing SYS_Connect to server on startup...\n"; //<-------------------
+    GameEvent connectToServer;                                                               //<-------------------
+    connectToServer.type = EventType::SYS_Connect;                                           //<-------------------
+    connectToServer.stringPayload = "127.0.0.1"; // The Server IP                            //<-------------------
+    sharedData.s_outboundEvents.push(connectToServer);
   }
 
   void handleEvent(const sf::Event& event, sf::RenderWindow& window) override

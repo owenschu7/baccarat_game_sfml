@@ -31,7 +31,6 @@ private:
     ImGui::PopFont();
     ImGui::PopStyleColor();
   }
-
 public:
 
   LoadingScreen(SharedData &sharedData) : Screen(sharedData)
@@ -39,13 +38,6 @@ public:
     //set up a dark blue background for the menu
     menuBackground.setSize(sf::Vector2f({1920.0f, 1080.0f}));
     menuBackground.setFillColor(sf::Color(20, 20, 50));
-
-    // 1. Tell the engine to physically connect
-    GameEvent connectToServer;
-    connectToServer.type = EventType::SYS_Connect;
-    connectToServer.stringPayload = "127.0.0.1"; // The Server IP
-    DEBUG_PRINT << "LoadingScreen(constructor): pushing connectToServer event to s_outboundEvents\n";
-    sharedData.s_outboundEvents.push(connectToServer);
   }
 
   void handleEvent(const sf::Event& event, sf::RenderWindow& window) override

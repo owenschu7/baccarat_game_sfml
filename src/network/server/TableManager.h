@@ -40,7 +40,7 @@ public:
     void routeEventToTable(int tableID, Player* player, const GameEvent& event);
 
     // Packages up all the table info so SessionManager can send it to a new client
-    GameEvent getLobbyListEvent();
+    GameEvent getAvailableTablesListEvent();
 
     // ------------------------------------------------------------------
     // PLAYER MANAGEMENT

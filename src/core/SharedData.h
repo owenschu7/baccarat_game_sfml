@@ -16,6 +16,7 @@ struct SharedData {
   bool s_settingsChanged = false; //flag to update screen when changes occur (this should turn true when any change has been made, and false when we update the changes)
   
   bool s_isOnline = false;
+  bool s_isLoggedIn = false;
 
   float s_musicVolume = 0.5f;
   float s_sfxVolume = 0.3f;

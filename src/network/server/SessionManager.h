@@ -96,7 +96,7 @@ public:
       case EventType::GET_AvailableTables:
         {
           DEBUG_PRINT << "GET_AvailableTables: \n";
-          GameEvent lobbyData = m_tableManager.getLobbyListEvent();
+          GameEvent lobbyData = m_tableManager.getAvailableTablesListEvent();
           m_sendCallback(client_fd, lobbyData);
           break;
         }
