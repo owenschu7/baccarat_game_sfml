@@ -1,45 +1,16 @@
 #include "Screen.h"
 #include <SFML/Graphics.hpp>
 #include <imgui.h>
-#include "../core/Debug.h"
+#include <iostream> // FIX: debug info
 
-class MainMenuScreen : public Screen
+class StartScreen : public Screen
 {
 private:
   ScreenState nextState = ScreenState::None;
-
+  
   sf::RectangleShape menuBackground;
 
   // --- UI HELPER METHODS ---
-
-  void drawServerStatus(ImVec2 screenSize)
-  {
-    ImFont* defaultFont = ImGui::GetIO().Fonts->Fonts[0];
-    ImGui::PushFont(defaultFont);
-
-    // 1. Check the flag to determine the text and the color
-    const char* statusString = m_shared.s_isOnline ? "Status: Online" : "Status: Offline";
-
-    // Green (RGBA) for Online, Red (RGBA) for Offline
-    ImVec4 statusColor = m_shared.s_isOnline ? ImVec4(0.2f, 1.0f, 0.2f, 1.0f) 
-                                             : ImVec4(1.0f, 0.2f, 0.2f, 1.0f); 
-
-    // 2. Calculate size based on the specific word so right-alignment is flawless
-    ImVec2 statusSize = ImGui::CalcTextSize(statusString);
-
-    float topRightPadding = 20.0f;
-    float statusX = screenSize.x - statusSize.x - topRightPadding;
-    float statusY = topRightPadding; 
-
-    ImGui::SetCursorPos(ImVec2(statusX, statusY));
-
-    // 3. Apply the dynamic color and print
-    ImGui::PushStyleColor(ImGuiCol_Text, statusColor); 
-    ImGui::Text("%s", statusString);
-
-    ImGui::PopStyleColor();
-    ImGui::PopFont();
-  }
 
   void drawTitle(ImVec2 screenSize)
   {
@@ -82,21 +53,12 @@ private:
 
     // 2. Pass ImVec2(0.0f, 0.0f) to make the button auto-size to the text width and height
     // (If you still want them to be chunky 100px tall buttons, use ImVec2(0.0f, 100.0f) instead!)
-    if (ImGui::Button("Join A Table", ImVec2(0.0f, buttonHeight))) 
+    if (ImGui::Button("Start", ImVec2(0.0f, buttonHeight))) 
     {
-      //create event
-      GameEvent getAvailableTables;
-      getAvailableTables.type = EventType::GET_AvailableTables;
-      DEBUG_PRINT << "MainMenuScreen.h: drawButtons(): sending getAvailableTables event\n";
-      //send event
-      m_shared.s_outboundEvents.push(getAvailableTables);
-      nextState = ScreenState::Tables;
-    }
-
-    ImGui::SetCursorPosX(leftPadding);
-    if (ImGui::Button("Settings", ImVec2(0.0f, buttonHeight))) 
-    {
-      nextState = ScreenState::Settings;
+      //switch to a loading screen
+      //connect to the server
+      // switch to MainMenu
+      nextState = ScreenState::Loading;
     }
 
     ImGui::SetCursorPosX(leftPadding);
@@ -110,10 +72,6 @@ private:
     ImGui::PopStyleVar(2);  
     ImGui::PopFont();
   }
-
-
-
-
 
   void DrawUsername(ImVec2 screenSize)
   {
@@ -202,9 +160,10 @@ private:
     }
   }
 
+
 public:
 
-  MainMenuScreen(SharedData &sharedData) : Screen(sharedData)
+  StartScreen(SharedData &sharedData) : Screen(sharedData)
   {
     //set up a dark blue background for the menu
     menuBackground.setSize(sf::Vector2f({1920.0f, 1080.0f}));
@@ -218,7 +177,7 @@ public:
       //pressing "Enter" signals we want to switch to the game state
       if (keyPressed->scancode == sf::Keyboard::Scancode::Enter)
       {
-        nextState = ScreenState::Game;
+        nextState = ScreenState::MainMenu;
       }
     }
   }
@@ -239,14 +198,9 @@ public:
     ImGui::Begin("Menu Layer", nullptr, windowFlags);
 
       // 2. Call our neat little helper functions!
-    drawServerStatus(screenSize);
     drawTitle(screenSize);
     drawButtons(screenSize);
 
-    // will draw username based on 3 conditions 
-    // - new user (prompts for username, then stores it)
-    // - logged in (draws username in corner)
-    // - searching for username (looking in files/authenticating with servers)
     DrawUsername(screenSize); 
 
     // 3. End the window

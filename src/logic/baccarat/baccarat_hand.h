@@ -1,6 +1,6 @@
 #ifndef BACCARAT_HAND
 #define BACCARAT_HAND
-#include "card.h"
+#include "../card.h"
 
 //this is a class for handling calculations of certain card combinations
 //holds 2-3 card objects and can calculate total score

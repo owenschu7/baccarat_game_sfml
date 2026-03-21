@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 
+#include "../core/Debug.h"
+
 class AvailableTablesScreen : public Screen
 {
 private:
@@ -93,7 +95,7 @@ private:
         // present a join button regardless of if there is people in it
         ImGui::TableNextColumn();
         if (ImGui::Button("JOIN", ImVec2(-FLT_MIN, 0))) {
-          std::cout << "Joining " << table.name << std::endl;
+          DEBUG_PRINT << "availableTablesScreen.h: drawTable(): joining " << table.name << std::endl;
         }
 
         // --- 4. Sub-Table (The problematic part) ---
@@ -327,11 +329,13 @@ public:
     // 1. Define how much vertical space you need for the button + padding
     float bottomReservedSpace = 100.0f; 
 
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     // 2. Wrap the table in a Child Window. 
     // ImVec2(0.0f, -bottomReservedSpace) means: 
     // Width = 0 (Fill width), Height = Fill available height MINUS bottomReservedSpace
     ImGui::BeginChild("TableScrollRegion", ImVec2(0.0f, -bottomReservedSpace), false);
     drawTable(screenSize, myTables);
+    ImGui::PopStyleColor(1);
     ImGui::EndChild();
 
     // 3. The cursor is now safely positioned below the child window

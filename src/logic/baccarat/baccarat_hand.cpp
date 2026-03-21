@@ -1,4 +1,4 @@
-#include "card.h"
+#include "../card.h"
 #include "baccarat_hand.h"
 
 Baccarat_hand::Baccarat_hand()

@@ -173,8 +173,10 @@ public:
                                    ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin("Settings Layer", nullptr, windowFlags);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     drawSettingsText(screenSize);
     drawButtons(screenSize);
+    ImGui::PopStyleColor(1);
     ImGui::End();
   }
 

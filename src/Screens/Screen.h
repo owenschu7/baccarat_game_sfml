@@ -6,6 +6,8 @@
 enum class ScreenState
 {
   None,
+  Start,
+  Loading,
   MainMenu,
   Settings,
   Tables,

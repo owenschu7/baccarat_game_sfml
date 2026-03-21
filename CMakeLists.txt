@@ -48,38 +48,54 @@ FetchContent_Declare(imgui_sfml
 
 FetchContent_MakeAvailable(imgui_sfml)
 
-# tell Cmake the name of your final program (run) and tells it
-# which source files to compile to make it (src/main.cpp)
-# when you add new .cpp files to your game you will list 
-# them here -------------------V
-add_executable(run 
-  src/main.cpp
-  src/core/SettingsManager.cpp
-  src/Screens/Screen.h
-  src/Screens/MainMenuScreen.h
-  src/Screens/GameScreen.h
-
-  #headers
-  src/logic/card.h
-  src/logic/deck.h
-  src/logic/player.h
-  src/logic/baccarat_hand.h
-  src/logic/baccarat_table.h
-
-  #source files
+# create shared files (for both the client and server)
+set(SHARED_SOURCES
+  src/core/GameEvents.h
+  src/logic/baccarat/baccarat_hand.cpp
+  src/logic/baccarat/baccarat_table.cpp
   src/logic/card.cpp
   src/logic/deck.cpp
-  src/logic/player.cpp
-  src/logic/baccarat_hand.cpp
-  src/logic/baccarat_table.cpp
-
-  # src/Card.cpp <- example
+  src/logic/baseTable.cpp
 )
-target_compile_features(run PRIVATE cxx_std_20)
+
+# CLIENT EXECUTABLE
+set(CLIENT_SOURCES
+  src/main.cpp
+  src/application.cpp
+  src/core/SettingsManager.cpp
+  src/network/client/NetworkClient.cpp
+  src/Screens/Screen.h
+  src/Screens/StartScreen.h
+  src/Screens/LoadingScreen.h
+  src/Screens/MainMenuScreen.h
+  src/Screens/SettingsScreen.h
+  src/Screens/availableTablesScreens.h
+  src/Screens/demoScreen.h
+  # ... add the rest of your .cpp screens here ...
+)
+
+add_executable(client ${CLIENT_SOURCES} ${SHARED_SOURCES})
+
+
+# SERVER EXECUTABLE
+set(SERVER_SOURCES
+  src/network/server/server.cpp
+  src/network/server/ServerApplication.cpp
+  src/network/server/TableManager.cpp
+  src/network/server/player.cpp
+  # If you create a GameServer.cpp class later, it goes here!
+)
+
+add_executable(server ${SERVER_SOURCES} ${SHARED_SOURCES})
+
+
+target_compile_features(client PRIVATE cxx_std_20)
+target_compile_features(server PRIVATE cxx_std_20)
+
 
 # this connects the SFML libraries to your executable.
 # if your games noods networking, you would simlpy add sfml-network to this
-target_link_libraries(run PRIVATE 
+target_link_libraries(client PRIVATE 
   SFML::Graphics
   ImGui-SFML::ImGui-SFML
   uuid

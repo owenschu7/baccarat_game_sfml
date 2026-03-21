@@ -1,11 +1,11 @@
 #include <iostream>
-#include "card.h"
-#include "deck.h"
+#include "../card.h"
+#include "../deck.h"
 #include "baccarat_hand.h"
 #include "baccarat_table.h"
 #include "baccarat_defs.h"
 
-Baccarat_table::Baccarat_table()
+Baccarat_table::Baccarat_table(int id, int maxP) : BaseTable(id, GameType::BACCARAT, maxP)
 {
 }
 
@@ -175,4 +175,31 @@ Round_Record Baccarat_table::play_round()
   m_outcomes.push_back(current_round);
 
   return current_round;
+}
+
+
+//for base class
+void Baccarat_table::handleEvent(Player* player, const GameEvent& event) {
+    // This is where you will eventually check what the player sent over the network.
+    // e.g., if (event.type == PLACE_BET) { record player's bet }
+}
+
+void Baccarat_table::update() {
+    // A super simple, bare-bones way to run the game
+    if (state == TableState::WAITING_FOR_PLAYERS) {
+        if (currentPlayers.size() > 0) {
+            state = TableState::GAME_IN_PROGRESS;
+        }
+    } 
+    else if (state == TableState::GAME_IN_PROGRESS) {
+        
+        // BOOM. Here is where you use your old logic exactly as it was.
+        // It plays the round, does the math, and returns the record.
+        Round_Record result = play_round(); 
+
+        // Now you just take 'result' and use it to figure out who won
+        // so you can send the results to the network!
+        
+        state = TableState::WAITING_FOR_PLAYERS; // Reset for the next hand
+    }
 }
