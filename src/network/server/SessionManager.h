@@ -14,6 +14,10 @@
  * 3.) If a game needs to send a message back to a player, it tells the
  * SessionManager which uses sendCallback to send a message back to the server.
  * ========================================================================= */
+
+//SessionManager class
+//  keeps track of all the players in the server and what they are currently doing
+//  - game events are routed from the server into the table
 #pragma once
 
 #include <unordered_map>

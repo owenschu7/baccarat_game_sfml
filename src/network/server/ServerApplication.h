@@ -1,3 +1,7 @@
+//ServerApplication class handles all data coming into the server
+// - run() starts the application, gets data from either a new connection, or a existing user
+// - each time a user sends data it strips the packet down into a game event and sends it to the session manager
+
 #pragma once
 
 #include <vector>

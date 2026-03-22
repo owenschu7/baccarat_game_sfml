@@ -22,6 +22,7 @@ void SessionManager::onClientConnected(int client_fd)
   m_activePlayers[client_fd] = std::move(guestPlayer);
 }
 
+
 // 3. HANDLE CLIENT MESSAGE
 void SessionManager::handleClientMessage(int client_fd, const GameEvent& event)
 {
@@ -33,10 +34,9 @@ void SessionManager::handleClientMessage(int client_fd, const GameEvent& event)
   // ---------------------------------------------------------
   if (event.type == EventType::SYS_Connect)
   {
-    DEBUG_PRINT << "    SYS_Connect: \n"
-      << "    - Player logged in: " << event.senderUsername << "\n"
-      << "    -  ID: " << event.senderUUID << "\n"
-      << "    -  FD: " << client_fd << "\n";
+    DEBUG_PRINT  << "    - Player logged in: " << event.senderUsername << "\n"
+                 << "    -  UUID: " << event.senderUUID << "\n"
+                 << "    -  FD: " << client_fd << "\n";
 
     // Instantiating your actual Player class! 
     auto newPlayer = std::make_unique<Player>(client_fd, event.senderUUID, event.senderUsername);

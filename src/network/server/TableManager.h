@@ -1,3 +1,9 @@
+// TableManger class
+// responsible for managing all active tables (game instances) on the server
+// - add/remove player to table
+// - get all active tables
+// - create tables (eventually)
+// - 
 #pragma once
 
 #include <unordered_map>
