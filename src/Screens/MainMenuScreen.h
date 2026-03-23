@@ -120,7 +120,6 @@ private:
 
   void drawButtons(ImVec2 screenSize)
   {
-    DEBUG_PRINT << "MainMenuScreen.h: drawButtons():";
     float buttonWidth = 600.0f;
     float buttonHeight = 80.0f;
     float leftPadding = 40.0f;

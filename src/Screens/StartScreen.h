@@ -55,17 +55,17 @@ private:
     // (If you still want them to be chunky 100px tall buttons, use ImVec2(0.0f, 100.0f) instead!)
     if (ImGui::Button("Start", ImVec2(0.0f, buttonHeight))) 
     {
-      DEBUG_PRINT << "StartScreen: Pushing USER_In to server...\n";           //<-------------------
-      GameEvent loginEvent;                                                    //<-------------------
-      loginEvent.type = EventType::USER_In;                                    //<-------------------
-      loginEvent.senderUsername = m_shared.s_currentUsername;                  //<-------------------
-      loginEvent.stringPayload = "password123"; // Placeholder for future auth //<-------------------
-      m_shared.s_outboundEvents.push(loginEvent);                              //<-------------------
+      DEBUG_PRINT << "StartScreen: Pushing SYS_Connect to server...\n";           //<-------------------
+      GameEvent connectEvent;                                                    //<-------------------
+      connectEvent.type = EventType::SYS_Connect;                                    //<-------------------
+      connectEvent.senderUsername = m_shared.s_currentUsername;                  //<-------------------
+      connectEvent.senderUUID = m_shared.s_currentUUID;                  //<-------------------
+      connectEvent.stringPayload = ""; // Placeholder for future auth //<-------------------
+      m_shared.s_outboundEvents.push(connectEvent);                              //<-------------------
 
-      //switch to a loading screen
-      //connect to the server
-      // switch to MainMenu
-      m_nextState = ScreenState::Loading;
+      //mainmenu will handle if connection success or not
+      //mainmenu will handle login requests
+      m_nextState = ScreenState::MainMenu;
     }
 
     ImGui::SetCursorPosX(leftPadding);
@@ -175,12 +175,6 @@ public:
     //set up a dark blue background for the menu
     menuBackground.setSize(sf::Vector2f({1920.0f, 1080.0f}));
     menuBackground.setFillColor(sf::Color(20, 20, 50));
-    //connect to the server
-    DEBUG_PRINT << "StartScreen(constructor): Pushing SYS_Connect to server on startup...\n"; //<-------------------
-    GameEvent connectToServer;                                                               //<-------------------
-    connectToServer.type = EventType::SYS_Connect;                                           //<-------------------
-    connectToServer.stringPayload = "127.0.0.1"; // The Server IP                            //<-------------------
-    sharedData.s_outboundEvents.push(connectToServer);
   }
 
   void handleEvent(const sf::Event& event, sf::RenderWindow& window) override

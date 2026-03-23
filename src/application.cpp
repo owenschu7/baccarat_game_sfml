@@ -92,7 +92,7 @@ void Application::update()
   //update imgui before your screens update
   ImGui::SFML::Update(m_window, m_deltaClock.restart());
 
-  // the mail carrier
+  // process the mail carrier
   processNetwork();
 
   applySettingsChanges(); // this is where the changes (if any) will be applied to the game
@@ -120,11 +120,9 @@ void Application::render()
 
 }
 
+//processNetwork() - 
 void Application::processNetwork()
 {
-  // ==========================================
-  // 1. OUTBOUND MAIL: Client -> Server
-  // ==========================================
   // We drain the Outbox completely every frame. The UI screens drop 
   // GameEvents in here, and this function physically sends them over TCP.
   while (!m_sharedData.s_outboundEvents.empty())
@@ -134,82 +132,39 @@ void Application::processNetwork()
     GameEvent event = m_sharedData.s_outboundEvents.front();
     m_sharedData.s_outboundEvents.pop();
 
-    // --- SYSTEM EVENTS (Hardware/Socket Commands) ---
-    // The Application handles these directly instead of packing them.
-    DEBUG_PRINT << "  event.type = " << static_cast<int>(event.type) << "\n";
 
-    if (event.type == EventType::SYS_Connect)
-    {
-      DEBUG_PRINT << "  in SYS_Connect:\n";
-      DEBUG_PRINT << "  - Attempting to connect to " << event.stringPayload << "...\n";
-      // Physically open the TCP socket. 
-      // stringPayload holds the IP address (e.g., "127.0.0.1")
-      if (m_network.connectToServer(event.stringPayload, "8080"))
-      {
-        //connection success
-        DEBUG_PRINT << "  - connection success\n";
-        GameEvent connectionSuccessEvent;
-
-        connectionSuccessEvent.type = EventType::SYS_Connect_Success;
-
-        DEBUG_PRINT << "  - pushing SYS_Connect_Success to s_inboundEvents\n";
-        m_sharedData.s_inboundEvents.push(connectionSuccessEvent);
-      }
-      else {
-        // connection failed
-        DEBUG_PRINT << "  - connection failed\n";
-        GameEvent connectionFailedEvent;
-
-        connectionFailedEvent.type = EventType::SYS_Connect_Failed;
-
-        DEBUG_PRINT << "  - pushing SYS_Connect_Failed to s_inboundEvents\n";
-        m_sharedData.s_inboundEvents.push(connectionFailedEvent);
-      }
-
-    }
-    else if (event.type == EventType::SYS_Disconnect)
-    {
-      DEBUG_PRINT << "  in SYS_Disconnect:\n";
-      DEBUG_PRINT << "  - Disconnecting from server.\n";
-      // Physically close the TCP socket
-      m_network.disconnect();
-    }
     // --- GAME EVENTS (Bets, Chat, Movement) ---
     // These need to be packed into binary and shipped across the internet.
-    else
+    DEBUG_PRINT << "sending event: " << event <<"\n";
+
+    // 1. Initialize the PacketBuilder to crush the struct into binary
+    PacketBuilder packet;
+
+    // 2. Pack the data in a strict, predictable order
+    packet.append8(static_cast<uint8_t>(event.type)); // OpCode (1 byte)
+    packet.appendString(event.senderUUID.c_str());    // UUID (Dynamic length + Null term)
+    packet.appendString(event.senderUsername.c_str()); // Username + Null term
+    packet.append32(event.intPayload);                // Int (4 bytes, Network Byte Order)
+    packet.appendString(event.stringPayload.c_str()); // String (Dynamic length + Null term)
+
+    // 3. Finalize: Calculates total size and prepends the 2-byte length header
+    packet.finalize();
+
+    const uint8_t* rawData = packet.getPtr();
+    size_t totalSize = packet.getSize();
+
+    DEBUG_PRINT << "[PACKET DUMP]\n"
+                << "Size: " << totalSize << " bytes\n"
+                << "Data: ";
+    for (size_t i = 0; i < totalSize; i++)
     {
-      DEBUG_PRINT << "  in NOT SYS Event:\n";
-      DEBUG_PRINT << "  - creating packet:\n";
-
-      // 1. Initialize the PacketBuilder to crush the struct into binary
-      PacketBuilder packet;
-
-      // 2. Pack the data in a strict, predictable order
-      packet.append8(static_cast<uint8_t>(event.type)); // OpCode (1 byte)
-      packet.appendString(event.senderUUID.c_str());    // UUID (Dynamic length + Null term)
-      packet.appendString(event.senderUsername.c_str()); // Username + Null term
-      packet.append32(event.intPayload);                // Int (4 bytes, Network Byte Order)
-      packet.appendString(event.stringPayload.c_str()); // String (Dynamic length + Null term)
-
-      // 3. Finalize: Calculates total size and prepends the 2-byte length header
-      packet.finalize();
-
-      // NOTE: debug code to print the raw packet before sending
-      const uint8_t* rawData = packet.getPtr();
-      size_t totalSize = packet.getSize();
-
-      DEBUG_PRINT << "    - [PACKET DUMP] Size: " << totalSize << " bytes\n";
-      DEBUG_PRINT << "    - Data: ";
-      for (size_t i = 0; i < totalSize; i++)
-      {
-        // Print each byte as a 2-digit Hex number (e.g., 0A, FF, 62)
-        DEBUG_PRINTF("%02X ", rawData[i]); 
-      }
-
-      // 4. Hand the raw memory block to the NetworkClient to push to the OS buffer
-      DEBUG_PRINT << "  - sending packet\n";
-      m_network.sendPacket(packet);
+      // Print each byte as a 2-digit Hex number (e.g., 0A, FF, 62)
+      DEBUG_PRINTF("%02X ", rawData[i]); 
     }
+    DEBUG_PRINT << "\n";
+
+    // 4. Hand the raw memory block to the NetworkClient to push to the OS buffer
+    m_network.sendPacket(packet);
   }
 
 

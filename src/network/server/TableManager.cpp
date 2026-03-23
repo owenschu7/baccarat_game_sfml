@@ -2,18 +2,13 @@
 #include "player.h"
 #include <iostream>
 
-TableManager::TableManager() {
-  initializeDefaultTables();
-}
-
-void TableManager::initializeDefaultTables() {
-  // Let's create two Baccarat tables to start.
-  // Using your constructor: Baccarat_table(int id, int maxP)
+TableManager::TableManager()
+{
   m_tables[1] = std::make_unique<Baccarat_table>(1, 8); 
   m_tables[2] = std::make_unique<Baccarat_table>(2, 8);
-
   DEBUG_PRINT << "TableManager: Initialized " << m_tables.size() << " tables on the casino floor.\n";
 }
+
 
 void TableManager::updateAll() {
   // Tick every single table. If a table is empty, its update() function 

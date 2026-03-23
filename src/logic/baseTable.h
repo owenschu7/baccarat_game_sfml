@@ -25,7 +25,7 @@ protected:
     GameType type;
     TableState state;
     int maxPlayers;
-    std::vector<Player*> currentPlayers; 
+    std::vector<Player*> currentPlayers;
 
 public:
     BaseTable(int id, GameType t, int maxP);

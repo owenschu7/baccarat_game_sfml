@@ -29,29 +29,21 @@ private:
     std::unordered_map<int, std::unique_ptr<BaseTable>> m_tables;
 
 public:
-    TableManager();
+    TableManager(); // constructor initalizes two tables on boot
     ~TableManager() = default;
-
-    // Sets up the initial casino floor when the server boots
-    void initializeDefaultTables();
 
     // The Global Tick: Called by ServerApplication ~10 times a second
     void updateAll();
 
 
-    // ------------------------------------------------------------------
-    // EVENT ROUTING
-    // ------------------------------------------------------------------
+    // event routing
     // Takes an action from SessionManager and hands it to the specific table
     void routeEventToTable(int tableID, Player* player, const GameEvent& event);
 
     // Packages up all the table info so SessionManager can send it to a new client
     GameEvent getAvailableTablesListEvent();
 
-    // ------------------------------------------------------------------
-    // PLAYER MANAGEMENT
-    // ------------------------------------------------------------------
-    
+    //player management
     bool addPlayerToTable(int tableID, Player* player);
     void removePlayerFromTable(int tableID, Player* player);
     
