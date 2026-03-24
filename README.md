@@ -2,9 +2,9 @@
 is a multiplayer, client-server casino platform. The architecture allows a central server to manage multiple concurrent game tables, while clients can seamlessly connect, view available lobbies, and join active games in real-time.
 
 # Features
-- Centralized Server Architecture: A robust backend that maintains game states, calculates payouts, and broadcasts updates to all connected clients.
+- Real-Time Multiplayer: Built with raw sockets for fast, peer-to-peer style communication.
+- Server Architecture: Backend maintains game states, calculates payouts, and broadcasts updates to all connected clients.
 - Dynamic Lobbies: Players can query the server to see a list of active tables, current player counts, and game statuses before joining.
-- Real-Time Multiplayer: Built with raw sockets for fast, peer-to-peer style communication and state synchronization.
 - Graphical Client: A smooth user interface utilizing SFML and ImGui for a quality desktop experience. 
 
 # Architecture Overview
