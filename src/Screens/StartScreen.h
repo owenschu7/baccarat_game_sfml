@@ -55,13 +55,15 @@ private:
     // (If you still want them to be chunky 100px tall buttons, use ImVec2(0.0f, 100.0f) instead!)
     if (ImGui::Button("Start", ImVec2(0.0f, buttonHeight))) 
     {
-      DEBUG_PRINT << "StartScreen: Pushing SYS_Connect to server...\n";           //<-------------------
-      GameEvent connectEvent;                                                    //<-------------------
-      connectEvent.type = EventType::SYS_Connect;                                    //<-------------------
-      connectEvent.senderUsername = m_shared.s_currentUsername;                  //<-------------------
-      connectEvent.senderUUID = m_shared.s_currentUUID;                  //<-------------------
-      connectEvent.stringPayload = ""; // Placeholder for future auth //<-------------------
-      m_shared.s_outboundEvents.push(connectEvent);                              //<-------------------
+      //connecting to the server
+
+      DEBUG_PRINT << "StartScreen: Pushing SYS_Connect to server...\n";
+      GameEvent connectEvent;
+      connectEvent.type = EventType::SYS_Connect;
+      connectEvent.senderUsername = m_shared.s_currentUsername;
+      connectEvent.senderUUID = m_shared.s_currentUUID;
+      connectEvent.stringPayload = ""; // Placeholder for future auth
+      m_shared.s_outboundEvents.push(connectEvent);
 
       //mainmenu will handle if connection success or not
       //mainmenu will handle login requests

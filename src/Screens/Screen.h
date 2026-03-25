@@ -47,6 +47,12 @@ public:
           m_nextState = ScreenState::Start; // Kick them to the start screen
           continue;
       }
+      if (incoming.type == EventType::SYS_Connect) {
+          m_shared.s_isOnline = true;
+          m_nextState = ScreenState::MainMenu;
+        std::cout << "sys_connect\n";
+          continue;
+      }
 
       // Route the event to the specific active screen
       onNetworkEvent(incoming);

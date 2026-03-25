@@ -200,11 +200,11 @@ void ServerApplication::handleClientData(size_t pollIndex)
 
   ssize_t bytes_received = recv(client_fd, buf, sizeof(buf), 0);
 
-  if (bytes_received <= 0) 
+  if (bytes_received <= 0)
   {
     disconnectClient(pollIndex);
-  } 
-  else 
+  }
+  else
   {
     // 1. Grab this client's personal binary waiting room
     auto& buffer = m_clientBuffers[client_fd];

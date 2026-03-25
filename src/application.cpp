@@ -132,7 +132,15 @@ void Application::processNetwork()
     GameEvent event = m_sharedData.s_outboundEvents.front();
     m_sharedData.s_outboundEvents.pop();
 
+    // if the packet is a sys_connect we dont send a packet, instead we call connectToServer()
+    if (event.type == EventType::SYS_Connect)
+    {
+      DEBUG_PRINT << "sys_connect detected\n";
+      m_network.connectToServer("127.0.0.1", "8080");
+    }
 
+
+    //CLIENT -> SERVER
     // --- GAME EVENTS (Bets, Chat, Movement) ---
     // These need to be packed into binary and shipped across the internet.
     DEBUG_PRINT << "sending event: " << event <<"\n";
@@ -168,9 +176,8 @@ void Application::processNetwork()
   }
 
 
-  // ==========================================
-  // 2. INBOUND MAIL: Server -> Client
-  // ==========================================
+  //SERVER -> CLIENT
+  // inbound events from Server to Client
   std::vector<uint8_t> rawPacket;
 
   // pollPacket() safely locks the thread mutex, grabs a packet if one exists, 
